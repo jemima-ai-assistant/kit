@@ -1,27 +1,44 @@
-<form id="signup" method="GET"
-      action="https://searchiest.app.n8n.cloud/webhook/subscribe">
-  <input name="firstName" required>
-  <input name="email" type="email" required>
-  <button type="submit">Subscribe and Get my agent</button>
-</form>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Subscribe</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 400px; margin: auto; }
+    input, button { width: 100%; margin: 0.5rem 0; padding: 0.5rem; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Get Your Agent</h1>
 
-<script>
-  // Wait until the DOM is ready
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('signup');
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault(); // stop the normal navigation
+  <!-- note the id="signup" here -->
+  <form id="signup"
+        method="GET"
+        action="https://searchiest.app.n8n.cloud/webhook/subscribe">
+    <input name="firstName" placeholder="First name" required>
+    <input name="email" type="email" placeholder="Email address" required>
+    <button type="submit">Subscribe and Get my agent</button>
+  </form>
 
-      // build the query string
-      const params = new URLSearchParams(new FormData(form)).toString();
+  <script>
+    (function(){
+      const form = document.getElementById('signup');
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();  // stop normal navigation
 
-      // fire the request to n8n so your flow still runs
-      await fetch(form.action + '?' + params, {
-        method: form.method.toUpperCase()
+        // build the query string
+        const qs  = new URLSearchParams(new FormData(form)).toString();
+        const url = form.action + '?' + qs;
+
+        // fire the GET to n8n in no-cors mode (so it never blocks)
+        fetch(url, { method: 'GET', mode: 'no-cors' });
+
+        // immediately send user to your static page
+        window.location.href = 'thank-you.html';
       });
+    })();
+  </script>
+</body>
+</html>
 
-      // now go to your static thank-you page
-      window.location.href = 'thank-you.html';
-    });
-  });
-</script>
