@@ -3,3 +3,21 @@
   <input name="email" type="email" required>
   <button type="submit">Subscribe and Get my agent</button>
 </form>
+
+<script>
+  document.getElementById('signup').addEventListener('submit', async function(e) {
+    e.preventDefault(); // stop the normal navigation
+
+    // build the query string or FormData
+    const form = e.target;
+    const params = new URLSearchParams(new FormData(form)).toString();
+
+    // fire the request to n8n (so your flow still runs)
+    await fetch(form.action + '?' + params, {
+      method: form.method.toUpperCase()
+    });
+
+    // now go to your static thank-you page
+    window.location.href = '/kit/thank-you.html';
+  });
+</script>
