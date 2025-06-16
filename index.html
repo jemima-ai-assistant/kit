@@ -1,23 +1,27 @@
-<form method="GET" action="https://searchiest.app.n8n.cloud/webhook/subscribe">
+<form id="signup" method="GET"
+      action="https://searchiest.app.n8n.cloud/webhook/subscribe">
   <input name="firstName" required>
   <input name="email" type="email" required>
   <button type="submit">Subscribe and Get my agent</button>
 </form>
 
 <script>
-  document.getElementById('signup').addEventListener('submit', async function(e) {
-    e.preventDefault(); // stop the normal navigation
+  // Wait until the DOM is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('signup');
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault(); // stop the normal navigation
 
-    // build the query string or FormData
-    const form = e.target;
-    const params = new URLSearchParams(new FormData(form)).toString();
+      // build the query string
+      const params = new URLSearchParams(new FormData(form)).toString();
 
-    // fire the request to n8n (so your flow still runs)
-    await fetch(form.action + '?' + params, {
-      method: form.method.toUpperCase()
+      // fire the request to n8n so your flow still runs
+      await fetch(form.action + '?' + params, {
+        method: form.method.toUpperCase()
+      });
+
+      // now go to your static thank-you page
+      window.location.href = 'thank-you.html';
     });
-
-    // now go to your static thank-you page
-    window.location.href = '/kit/thank-you.html';
   });
 </script>
