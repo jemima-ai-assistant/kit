@@ -2,44 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Email Confirmation</title>
-  <style>
-    body { font-family: sans-serif; padding: 2rem; }
-    #msg { font-size: 1.2rem; }
-  </style>
+  <title>Almost done</title>
 </head>
 <body>
-  <h1>Confirming your email…</h1>
-  <div id="msg">Please wait.</div>
-  <script>
-    (async function(){
-      const msg = document.getElementById('msg');
-      // Read the token from the URL
-      const params = new URLSearchParams(window.location.search);
-      const token  = params.get('token');
-      if (!token) {
-        msg.textContent = 'No token provided.';
-        return;
-      }
-      try {
-        // POST it to your confirm webhook
-        const resp = await fetch('https://searchiest.app.n8n.cloud/webhook/confirm', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token })
-        });
-        if (!resp.ok) throw new Error(resp.statusText);
-        const data = await resp.json();
-        if (data.ok) {
-          msg.innerHTML = '<strong>Confirmed!</strong> Download your product <a href="product.zip">here</a>.';
-        } else {
-          msg.textContent = 'That link is invalid or already used.';
-        }
-      } catch (err) {
-        console.error(err);
-        msg.textContent = 'Something went wrong. Please try again later.';
-      }
-    })();
-  </script>
+  <h1>Thanks for subscribing!</h1>
+  <p>Please check your email inbox for a confirmation link.</p>
 </body>
 </html>
