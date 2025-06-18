@@ -92,72 +92,69 @@
     <form id="signup">
       <input name="firstName" placeholder="First name" required>
       <input name="email" type="email" placeholder="Email address" required>
-      <button type="submit" id="submitBtn">Subscribe and Get my agent</button>
+      <button type="submit" id="submitBtn">Subscribe and Get My Agent</button>
       
       <div id="loading">
         <div class="spinner"></div>
-        <p>Processing your request...</p>
+        <p>Processing your request…</p>
       </div>
       
       <div class="error" id="errorMessage">
-        We're having trouble processing your request. Please try again.
+        We are having trouble processing your request. Please try again.
       </div>
       
       <div class="success-message" id="successMessage">
-        Success! Redirecting to your confirmation page...
+        Success! Moving you to the confirmation page…
       </div>
     </form>
   </div>
 
   <script>
-    (function(){
-      const form = document.getElementById('signup');
-      const submitBtn = document.getElementById('submitBtn');
-      const loading = document.getElementById('loading');
-      const errorMessage = document.getElementById('errorMessage');
-      const successMessage = document.getElementById('successMessage');
-      
-      form.addEventListener('submit', async function(e) {
+    (function () {
+      const form        = document.getElementById('signup');
+      const submitBtn   = document.getElementById('submitBtn');
+      const loading     = document.getElementById('loading');
+      const errorBox    = document.getElementById('errorMessage');
+      const successBox  = document.getElementById('successMessage');
+
+      // Your N8N production webhook
+      const webhookUrl  = 'https://searchiest.app.n8n.cloud/webhook/subscribe';
+
+      form.addEventListener('submit', async function (e) {
         e.preventDefault();
-        
-        // Show loading state
+
+        // User feedback
         submitBtn.disabled = true;
         loading.style.display = 'block';
-        errorMessage.style.display = 'none';
-        
-        // Get form data
+        errorBox.style.display = 'none';
+
+        // Gather data
         const formData = {
-          firstName: form.firstName.value,
-          email: form.email.value
+          firstName: form.firstName.value.trim(),
+          email:     form.email.value.trim()
         };
-        
+
         try {
-          // Send data to your backend (proxy solution)
-          const response = await fetch('/api/subscribe', {
+          const response = await fetch(webhookUrl, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
           });
-          
+
           if (response.ok) {
-            // Show success and redirect
-            successMessage.style.display = 'block';
+            successBox.style.display = 'block';
             loading.style.display = 'none';
-            
+
             setTimeout(() => {
               window.location.href = 'thank-you.html';
             }, 1500);
           } else {
-            // Handle server errors
-            throw new Error('Server responded with status: ' + response.status);
+            throw new Error('Server responded with status ' + response.status);
           }
-        } catch (error) {
-          // Show error message
-          console.error('Submission error:', error);
+        } catch (err) {
+          console.error('Submission error:', err);
           loading.style.display = 'none';
-          errorMessage.style.display = 'block';
+          errorBox.style.display = 'block';
           submitBtn.disabled = false;
         }
       });
