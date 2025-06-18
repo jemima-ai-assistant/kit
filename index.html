@@ -93,7 +93,7 @@
       <input name="firstName" placeholder="First name" required>
       <input name="email" type="email" placeholder="Email address" required>
 
-      <!-- hidden product code. -->
+      <!-- hidden product code -->
       <input name="productCode" id="productCode" type="hidden" value="productcode01">
 
       <button type="submit" id="submitBtn">Subscribe and Get My Agent</button>
@@ -108,7 +108,7 @@
       </div>
 
       <div class="success-message" id="successMessage">
-        Success! Moving you to the confirmation page…
+        Success. Thank you for subscribing.
       </div>
     </form>
   </div>
@@ -127,8 +127,8 @@
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        // visual feedback
-        submitBtn.disabled   = true;
+        // show progress
+        submitBtn.disabled    = true;
         loading.style.display = 'block';
         errorBox.style.display = 'none';
 
@@ -147,25 +147,16 @@
           });
 
           if (response.ok) {
+            loading.style.display = 'none';
             successBox.style.display = 'block';
-            loading.style.display    = 'none';
-
-            // decide next page
-            const nextPage = formData.productCode
-              ? `${formData.productCode}.html`
-              : 'confirm.html';
-
-            setTimeout(() => {
-              window.location.href = nextPage;
-            }, 1500);
           } else {
             throw new Error('Server responded with status ' + response.status);
           }
         } catch (err) {
           console.error('Submission error:', err);
-          loading.style.display = 'none';
+          loading.style.display  = 'none';
           errorBox.style.display = 'block';
-          submitBtn.disabled = false;
+          submitBtn.disabled     = false;
         }
       });
     })();
