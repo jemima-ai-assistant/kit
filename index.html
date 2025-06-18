@@ -5,40 +5,163 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Subscribe</title>
   <style>
-    body { font-family: sans-serif; padding: 2rem; max-width: 400px; margin: auto; }
-    input, button { width: 100%; margin: 0.5rem 0; padding: 0.5rem; font-size: 1rem; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      padding: 2rem; 
+      max-width: 400px; 
+      margin: auto;
+      background: #f8f9fa;
+      color: #333;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 2rem;
+      margin-top: 1rem;
+    }
+    input, button { 
+      width: 100%; 
+      margin: 0.75rem 0; 
+      padding: 0.75rem; 
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+    #loading {
+      display: none;
+      text-align: center;
+      margin: 1.5rem 0;
+      color: #64748b;
+    }
+    .spinner {
+      border: 3px solid rgba(37, 99, 235, 0.2);
+      border-top: 3px solid #2563eb;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .error {
+      color: #dc2626;
+      background: #fee2e2;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      display: none;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #1e293b;
+    }
+    .success-message {
+      display: none;
+      text-align: center;
+      color: #16a34a;
+      font-weight: 500;
+      margin-top: 1rem;
+    }
   </style>
 </head>
 <body>
   <h1>Get Your Agent</h1>
-
-  <!-- note the id="signup" here -->
-  <form id="signup"
-        method="GET"
-        action="https://searchiest.app.n8n.cloud/webhook/subscribe">
-    <input name="firstName" placeholder="First name" required>
-    <input name="email" type="email" placeholder="Email address" required>
-    <button type="submit">Subscribe and Get my agent</button>
-  </form>
+  
+  <div class="card">
+    <form id="signup">
+      <input name="firstName" placeholder="First name" required>
+      <input name="email" type="email" placeholder="Email address" required>
+      <button type="submit" id="submitBtn">Subscribe and Get my agent</button>
+      
+      <div id="loading">
+        <div class="spinner"></div>
+        <p>Processing your request...</p>
+      </div>
+      
+      <div class="error" id="errorMessage">
+        We're having trouble processing your request. Please try again.
+      </div>
+      
+      <div class="success-message" id="successMessage">
+        Success! Redirecting to your confirmation page...
+      </div>
+    </form>
+  </div>
 
   <script>
     (function(){
       const form = document.getElementById('signup');
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();  // stop normal navigation
-
-        // build the query string
-        const qs  = new URLSearchParams(new FormData(form)).toString();
-        const url = form.action + '?' + qs;
-
-        // fire the GET to n8n in no-cors mode (so it never blocks)
-        fetch(url, { method: 'GET', mode: 'no-cors' });
-
-        // immediately send user to your static page
-        window.location.href = 'thank-you.html';
+      const submitBtn = document.getElementById('submitBtn');
+      const loading = document.getElementById('loading');
+      const errorMessage = document.getElementById('errorMessage');
+      const successMessage = document.getElementById('successMessage');
+      
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        loading.style.display = 'block';
+        errorMessage.style.display = 'none';
+        
+        // Get form data
+        const formData = {
+          firstName: form.firstName.value,
+          email: form.email.value
+        };
+        
+        try {
+          // Send data to your backend (proxy solution)
+          const response = await fetch('/api/subscribe', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+          
+          if (response.ok) {
+            // Show success and redirect
+            successMessage.style.display = 'block';
+            loading.style.display = 'none';
+            
+            setTimeout(() => {
+              window.location.href = 'thank-you.html';
+            }, 1500);
+          } else {
+            // Handle server errors
+            throw new Error('Server responded with status: ' + response.status);
+          }
+        } catch (error) {
+          // Show error message
+          console.error('Submission error:', error);
+          loading.style.display = 'none';
+          errorMessage.style.display = 'block';
+          submitBtn.disabled = false;
+        }
       });
     })();
   </script>
 </body>
 </html>
-
